@@ -31,10 +31,20 @@ class RagSettings(BaseSettings):
         return self
 
 
+class TelemetrySettings(BaseSettings):
+    """Configuration for OpenTelemetry/Jaeger."""
+
+    model_config = SettingsConfigDict(env_prefix="TELEMETRY_")
+    service_name: str = "movie-recommendation-agent"
+    jaeger_endpoint: str = "http://localhost:4317"
+    jaeger_ui_url: str = "http://localhost:16686"
+
+
 class Settings(BaseSettings):
     """Root settings container - aggregates all config sections."""
 
     rag: RagSettings = RagSettings()
+    telemetry: TelemetrySettings = TelemetrySettings()
 
 
 @lru_cache
