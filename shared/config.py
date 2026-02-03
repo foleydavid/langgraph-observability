@@ -31,6 +31,17 @@ class RagSettings(BaseSettings):
         return self
 
 
+class LLMSettings(BaseSettings):
+    """Configuration for LLM (Claude) usage across all agents."""
+
+    model_config = SettingsConfigDict(env_prefix="LLM_")
+
+    model_name: str = "claude-sonnet-4-5-20250929"
+    max_tokens: int = 4096
+    timeout_seconds: float = 30.0
+    max_retries: int = 2
+
+
 class TelemetrySettings(BaseSettings):
     """Configuration for OpenTelemetry/Jaeger."""
 
@@ -44,6 +55,7 @@ class Settings(BaseSettings):
     """Root settings container - aggregates all config sections."""
 
     rag: RagSettings = RagSettings()
+    llm: LLMSettings = LLMSettings()
     telemetry: TelemetrySettings = TelemetrySettings()
 
 
