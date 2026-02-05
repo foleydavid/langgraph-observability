@@ -1,0 +1,5 @@
+.env
+wallet/
+setup/summary_data/chroma
+.idea/
+__pycache__/
