@@ -30,8 +30,16 @@ async def safely_call_llm(llm: ChatAnthropic, prompt: str, *, span: Span, timeou
     Returns the response content, or None on failure. Caller handles fallback.
     """
 
+    span.set_attribute("llm.prompt", prompt)
+
     try:
         response = await asyncio.wait_for(llm.ainvoke(prompt), timeout=timeout)
+
+        if hasattr(response, "usage_metadata") and response.usage_metadata:
+            span.set_attribute("llm.input_tokens", response.usage_metadata.get("input_tokens", 0))
+            span.set_attribute("llm.output_tokens", response.usage_metadata.get("output_tokens", 0))
+
+        span.set_attribute("llm.response", response.content)
         return response.content
     except asyncio.TimeoutError:
         span.set_attribute("error", "timeout")
