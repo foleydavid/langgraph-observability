@@ -9,7 +9,7 @@ from pydantic import Field
 
 from shared.config import get_settings
 from shared.helpers import safely_get_env
-from shared.telemetry import get_tracer
+from shared.telemetry import OpenTelemetryCallbackHandler, get_tracer
 
 
 def escape_sql_string(value: str) -> str:
@@ -200,7 +200,10 @@ class DatabaseAgent:
                         try:
                             with tracer.start_as_current_span("database_agent.invoke_graph") as graph_span:
                                 graph_span.set_attribute("llm.model", self.model_name)
-                                result = await self.graph.ainvoke({"messages": self.messages})
+                                result = await self.graph.ainvoke(
+                                    {"messages": self.messages},
+                                    config={"callbacks": [OpenTelemetryCallbackHandler("database_agent")]},
+                                )
 
                             langgraph_messages = result.get("messages", [])
                             if not langgraph_messages:
